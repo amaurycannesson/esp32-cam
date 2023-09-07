@@ -46,7 +46,7 @@ export default class Frontend extends Construct {
             files: ['**/*'],
           },
           cache: {
-            paths: ['node_modules/**/*'],
+            paths: ['./frontend/node_modules/**/*'],
           },
         },
       }).toBuildSpec(),
