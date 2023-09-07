@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.tpp": "cpp",
+    "include_i.h": "c"
+  }
+}
