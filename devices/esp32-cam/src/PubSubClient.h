@@ -20,6 +20,7 @@ public:
 private:
   void configureWill();
   void _onMessage(String &topic, String &payload);
+  void _addTime(StaticJsonDocument<128> &doc);
   std::vector<std::function<void(String &, String &)>> messageHandlers;
 };
 

@@ -69,6 +69,7 @@ void PubSubClient::configureWill()
     char jsonBuffer[64];
     StaticJsonDocument<128> doc;
     doc["status"] = "disconnected";
+    _addTime(doc);
     serializeJson(doc, jsonBuffer);
     mqttClient.setWill(ESP32_STATUS_TOPIC, jsonBuffer, true, 0);
 }
@@ -80,6 +81,21 @@ void PubSubClient::loop()
 
 void PubSubClient::publish(const char *topic, StaticJsonDocument<128> &doc, bool isRetained, int qos)
 {
+    _addTime(doc);
+    char jsonBuffer[256];
+    serializeJson(doc, jsonBuffer);
+    Log.noticeln("[TO: %s] %s", topic, jsonBuffer);
+    mqttClient.publish(topic, jsonBuffer, isRetained, qos);
+}
+
+void PubSubClient::publishRaw(const char *topic, const char *message)
+{
+    Log.noticeln("[TO: %s] %s", topic, message);
+    mqttClient.publish(topic, message);
+}
+
+void PubSubClient::_addTime(StaticJsonDocument<128> &doc)
+{
     struct tm timeinfo;
     if (getLocalTime(&timeinfo))
     {
@@ -87,14 +103,4 @@ void PubSubClient::publish(const char *topic, StaticJsonDocument<128> &doc, bool
         strftime(timeStr, sizeof(timeStr), "%Y-%m-%dT%H:%M:%SZ", &timeinfo);
         doc["time"] = timeStr;
     }
-
-    char jsonBuffer[256];
-    serializeJson(doc, jsonBuffer);
-    Log.noticeln("[TO: %s] %s", topic, jsonBuffer);
-    mqttClient.publish(topic, jsonBuffer, isRetained, qos);
-}
-
-void PubSubClient::publishRaw(const char *topic, const char *message) {
-    Log.noticeln("[TO: %s] %s", topic, message);
-    mqttClient.publish(topic, message);
 }
