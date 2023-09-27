@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import { useStore } from './useStore';
 import { AlarmState, LightState, PirState } from './types';
 import { useAutoAttachIotPolicy } from './useAutoAttachIotPolicy';
+import { ConnectionState } from '@aws-amplify/pubsub';
 
 const TakePicture = () => {
   const takePhoto = useStore((state) => state.takePhoto);
@@ -96,6 +97,7 @@ const Home = () => {
   const theme = useTheme();
 
   const init = useStore((state) => state.init);
+  const connectionState = useStore((state) => state.connectionState);
   const pirState = useStore((state) => state.pirState);
   const lightState = useStore((state) => state.lightState);
   const alarmState = useStore((state) => state.alarmState);
@@ -118,6 +120,7 @@ const Home = () => {
           boxShadow="0px 0px 8px rgba(0,0,0,.6)"
           height={64}
           alignItems="center"
+          justifyContent="space-between"
         >
           <Flex alignItems="center">
             <Image src="logo.svg" alt="logo" height={48} />
@@ -125,6 +128,7 @@ const Home = () => {
               Owly
             </Heading>
           </Flex>
+          <View marginRight={8}>{connectionState === ConnectionState.Connected ? '🟢' : '🔴'}</View>
         </Flex>
         <Card variation="elevated" margin={8}>
           <Heading level={6}>Alarm</Heading>
