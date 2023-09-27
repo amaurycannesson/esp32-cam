@@ -18,7 +18,8 @@ public:
   void publishRaw(const char *topic, const char *message);
 
 private:
-  void configureWill();
+  void _configureWill();
+  void _reconnect();
   void _onMessage(String &topic, String &payload);
   void _addTime(StaticJsonDocument<128> &doc);
   std::vector<std::function<void(String &, String &)>> messageHandlers;

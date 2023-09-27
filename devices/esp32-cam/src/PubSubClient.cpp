@@ -29,8 +29,15 @@ void PubSubClient::connect()
     wifiSecureClient.setPrivateKey(AWS_CERT_PRIVATE);
     mqttClient.begin(AWS_IOT_ENDPOINT, 8883, wifiSecureClient);
 
-    this->configureWill();
+    this->_configureWill();
 
+    this->_reconnect();
+
+    mqttClient.onMessage(std::bind(&PubSubClient::_onMessage, this, std::placeholders::_1, std::placeholders::_2));
+}
+
+void PubSubClient::_reconnect()
+{
     Log.noticeln("Connecting to AWS IOT...");
 
     while (!mqttClient.connect(THINGNAME))
@@ -46,8 +53,6 @@ void PubSubClient::connect()
     }
 
     Log.noticeln("AWS IoT Connected!");
-
-    mqttClient.onMessage(std::bind(&PubSubClient::_onMessage, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void PubSubClient::_onMessage(String &topic, String &payload)
@@ -64,7 +69,7 @@ void PubSubClient::subscribe(const char *topic)
     mqttClient.subscribe(topic);
 }
 
-void PubSubClient::configureWill()
+void PubSubClient::_configureWill()
 {
     char jsonBuffer[64];
     StaticJsonDocument<128> doc;
@@ -76,6 +81,11 @@ void PubSubClient::configureWill()
 
 void PubSubClient::loop()
 {
+    if (!mqttClient.connected())
+    {
+        this->_reconnect();
+    }
+
     mqttClient.loop();
 }
 
